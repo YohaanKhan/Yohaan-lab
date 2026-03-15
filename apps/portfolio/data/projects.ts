@@ -1,5 +1,5 @@
 import type { ProjectCardProps } from "@yohaan-lab/ui";
-import { Bot, Pencil, Crown, Puzzle, BookOpen, GitBranch, Search, FileText } from "lucide-react";
+import { Bot, Pencil, Crown, Spade, BookOpen, GitBranch, Search, FileText } from "lucide-react";
 
 type ProjectData = ProjectCardProps & { id: string };
 
@@ -32,14 +32,14 @@ export const projects: ProjectData[] = [
     status: "coming-soon",
   },
   {
-    id: "puzzle",
-    title: "Puzzle Lab",
-    description: "A browser-based logic puzzle game.",
-    icon: Puzzle,
-    href: "/puzzle",
-    tags: ["Game", "TypeScript"],
-    status: "coming-soon",
-  },
+    id: "poker",
+    title: "Poker Royale",
+    description: "Texas Hold'em with power-up cards and private rooms.",
+    icon: Spade,
+    href: "/poker",
+    tags: ["Game", "WebSockets", "FastAPI"],
+    status: "in-progress",
+},
   {
     id: "diary",
     title: "Diary + Quotes",
