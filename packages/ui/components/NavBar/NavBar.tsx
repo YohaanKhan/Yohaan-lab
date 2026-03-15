@@ -27,6 +27,19 @@ export function NavBar() {
           >
             GitHub
           </a>
+          <div className="h-4 w-px bg-border mx-1" />
+          <Link
+            href="/login"
+            className="font-mono text-xs sm:text-sm text-muted hover:text-primary transition-colors duration-200"
+          >
+            Login
+          </Link>
+          <Link
+            href="/register"
+            className="px-3 py-1.5 rounded-md bg-accent text-white font-sans text-xs sm:text-sm font-medium hover:opacity-90 transition-opacity duration-200"
+          >
+            Sign up
+          </Link>
         </div>
       </div>
     </nav>

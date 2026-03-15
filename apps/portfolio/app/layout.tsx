@@ -1,4 +1,4 @@
-import { NavBar } from "@yohaan-lab/ui";
+import { NavBar } from "@/components/NavBar/NavBar";
 import type { Metadata } from "next";
 import "./globals.css";
 
