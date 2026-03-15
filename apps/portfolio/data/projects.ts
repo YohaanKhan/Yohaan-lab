@@ -1,0 +1,79 @@
+import type { ProjectCardProps } from "@yohaan-lab/ui";
+import { Bot, Pencil, Crown, Puzzle, BookOpen, GitBranch, Search, FileText } from "lucide-react";
+
+type ProjectData = ProjectCardProps & { id: string };
+
+export const projects: ProjectData[] = [
+  {
+    id: "ai-assistant",
+    title: "AI Assistant",
+    description: "Chat with an AI that knows my work and projects.",
+    icon: Bot,
+    href: "/chat",
+    tags: ["RAG", "Llama", "Groq"],
+    status: "coming-soon",
+  },
+  {
+    id: "doodle-ai",
+    title: "Doodle AI",
+    description: "Draw something and let the model guess what it is.",
+    icon: Pencil,
+    href: "/doodle",
+    tags: ["CNN", "PyTorch"],
+    status: "coming-soon",
+  },
+  {
+    id: "chess",
+    title: "Chess Bot",
+    description: "Play against a chess engine in the browser.",
+    icon: Crown,
+    href: "/chess",
+    tags: ["Unity", "WebGL"],
+    status: "coming-soon",
+  },
+  {
+    id: "puzzle",
+    title: "Puzzle Lab",
+    description: "A browser-based logic puzzle game.",
+    icon: Puzzle,
+    href: "/puzzle",
+    tags: ["Game", "TypeScript"],
+    status: "coming-soon",
+  },
+  {
+    id: "diary",
+    title: "Diary + Quotes",
+    description: "A small journaling tool with AI quote suggestions.",
+    icon: BookOpen,
+    href: "/diary",
+    tags: ["Next.js", "AI"],
+    status: "coming-soon",
+  },
+  {
+    id: "algorithms",
+    title: "Algorithms",
+    description: "Interactive sorting and graph algorithm visualizations.",
+    icon: GitBranch,
+    href: "/algorithms",
+    tags: ["D3", "Visualization"],
+    status: "coming-soon",
+  },
+  {
+    id: "code-explorer",
+    title: "Code Explorer",
+    description: "Ask questions about any GitHub repository using AI.",
+    icon: Search,
+    href: "/code-ai",
+    tags: ["RAG", "GitHub"],
+    status: "coming-soon",
+  },
+  {
+    id: "blog",
+    title: "Blog",
+    description: "How I built everything on this site.",
+    icon: FileText,
+    href: "/blog",
+    tags: ["Writing"],
+    status: "coming-soon",
+  },
+];
