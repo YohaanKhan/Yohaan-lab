@@ -12,10 +12,10 @@ export function NavBar() {
           <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out group-hover:w-full" />
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           <Link
             href="/blog"
-            className="font-mono text-sm text-muted hover:text-primary transition-colors duration-200"
+            className="font-mono text-xs sm:text-sm text-muted hover:text-primary transition-colors duration-200"
           >
             Blog
           </Link>
@@ -23,7 +23,7 @@ export function NavBar() {
             href="https://github.com/YohaanKhan"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-mono text-sm text-muted hover:text-primary transition-colors duration-200"
+            className="font-mono text-xs sm:text-sm text-muted hover:text-primary transition-colors duration-200"
           >
             GitHub
           </a>
