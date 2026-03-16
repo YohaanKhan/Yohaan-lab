@@ -1,24 +1,13 @@
-export type PowerCard = {
-  id: string;
-  name: string;
-  tier: "rare" | "epic" | "mythic" | "legendary" | "ultra";
-  cost: number;
-  type: "offensive" | "defensive";
-  category: string;
-  desc: string;
-};
-
 export type PlayerState = {
   id: string;
   username: string;
   chips: number;
   hole_cards: string[];
-  power_cards: PowerCard[] | number;
-  momentum: number;
   bet: number;
   folded: boolean;
   disconnected: boolean;
   active_effects: string[];
+  eliminated: boolean;
 };
 
 export type GamePhase =
@@ -29,7 +18,8 @@ export type GamePhase =
   | "turn"
   | "river"
   | "showdown"
-  | "hand_complete";
+  | "hand_complete"
+  | "game_over";
 
 export type GameState = {
   room_code: string;
@@ -39,15 +29,10 @@ export type GameState = {
   pot: number;
   current_bet: number;
   active_player_id: string;
-  awaiting_response: boolean;
   player_order: string[];
   hand_number: number;
-  power_history: {
-    player_id: string;
-    power_id: string;
-    targets: Record<string, unknown>;
-  }[];
   winners: string[];
+  current_hand?: string;
   hand_summaries: Record<string, {
     hand_class: string;
     rank: number;

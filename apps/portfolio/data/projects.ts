@@ -37,7 +37,7 @@ export const projects: ProjectData[] = [
     description: "Texas Hold'em with power-up cards and private rooms.",
     icon: Spade,
     href: "/poker",
-    tags: ["Game", "WebSockets", "FastAPI"],
+    tags: ["Next.js", "Socket.io", "Python", "FastAPI"],
     status: "in-progress",
 },
   {

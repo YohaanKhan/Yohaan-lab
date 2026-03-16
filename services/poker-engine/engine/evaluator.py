@@ -1,10 +1,6 @@
-from treys import Card, Evaluator, Deck
+from itertools import combinations, product
+from treys import Card, Evaluator
 from engine.state import GameState, Player
-
-evaluator = Evaluator()
-
-from itertools import product
-from treys import Card, Evaluator, Deck
 
 evaluator = Evaluator()
 
@@ -57,41 +53,6 @@ def get_hand_class(rank: int) -> str:
     # Returns human readable hand class e.g. "Flush", "Two Pair"
     return evaluator.class_to_string(evaluator.get_rank_class(rank))
 
-def get_hand_rank_with_elevation(
-    hole_cards: list[str],
-    community_cards: list[str],
-    elevated: bool = False
-) -> int:
-    rank = get_best_hand_rank(hole_cards, community_cards)
-
-    if not elevated:
-        return rank
-
-    # Hand Elevation moves rank up one class
-    # In treys, lower score = better, so we find the best score
-    # in the next hand class up and return that
-    rank_class = evaluator.get_rank_class(rank)
-
-    # Royal Flush is class 1 — cannot elevate further
-    if rank_class <= 1:
-        return rank
-
-    # Return the minimum score (best hand) of the next class up
-    class_boundaries = {
-        9: 6185,  # High Card floor
-        8: 3325,  # One Pair floor
-        7: 2467,  # Two Pair floor
-        6: 1609,  # Three of a Kind floor
-        5: 1599,  # Straight floor
-        4: 322,   # Flush floor
-        3: 166,   # Full House floor
-        2: 10,    # Four of a Kind floor
-        1: 1,     # Straight Flush floor
-    }
-
-    elevated_class = rank_class - 1
-    return class_boundaries.get(elevated_class, rank)
-
 def determine_winner(state: GameState) -> list[str]:
     # Returns list of winner player_ids (list handles splits)
     active_players = [
@@ -102,18 +63,11 @@ def determine_winner(state: GameState) -> list[str]:
     if len(active_players) == 1:
         return [active_players[0].id]
 
-    elevated_ids = {
-        p.id for p in active_players
-        if "hand_elevation" in p.active_effects
-    }
-
     scores: dict[str, int] = {}
     for player in active_players:
-        elevated = player.id in elevated_ids
-        scores[player.id] = get_hand_rank_with_elevation(
+        scores[player.id] = get_best_hand_rank(
             player.hole_cards,
-            state.community_cards,
-            elevated=elevated
+            state.community_cards
         )
 
     best_score = min(scores.values())

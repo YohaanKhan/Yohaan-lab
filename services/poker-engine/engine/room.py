@@ -5,8 +5,6 @@ import time
 from engine.state import GameState, Player, Phase
 from engine.dealer import start_new_hand, deal_flop, deal_turn, deal_river
 from engine.evaluator import determine_winner, get_hand_summary
-from engine.momentum import replenish_momentum_for_phase
-from engine.powers import apply_power
 
 # In-memory room storage — fine for now, rooms are short-lived
 rooms: dict[str, GameState] = {}
@@ -34,7 +32,6 @@ def create_room(player_id: str, username: str) -> str:
                 username=username,
                 chips=1000,
                 hole_cards=[],
-                power_cards=[],
             )
         },
         dealer_index=0,
@@ -58,6 +55,11 @@ def join_room(room_code: str, player_id: str, username: str) -> None:
 
     state = rooms[room_code]
 
+    if player_id in state.players:
+        # Rejoining
+        state.players[player_id].disconnected = False
+        return
+
     if len(state.players) >= 4:
         raise ValueError("Room is full")
 
@@ -69,7 +71,6 @@ def join_room(room_code: str, player_id: str, username: str) -> None:
         username=username,
         chips=1000,
         hole_cards=[],
-        power_cards=[],
     )
     state.player_order.append(player_id)
 
@@ -91,24 +92,22 @@ def serialize_state(state: GameState, perspective_player_id: str) -> dict:
             or state.phase == Phase.SHOWDOWN
         )
         
-        # Power cards must be converted to dicts if they are objects
-        serialized_powers = [asdict(p) if hasattr(p, '__dataclass_fields__') else p for p in player.power_cards]
-        
         players_out[pid] = {
             "id": player.id,
             "username": player.username,
             "chips": player.chips,
             "hole_cards": player.hole_cards if revealed else ["?", "?"],
-            "power_cards": serialized_powers if pid == perspective_player_id else len(player.power_cards),
-            "momentum": player.momentum,
             "bet": player.bet,
             "folded": player.folded,
             "has_acted": player.has_acted,
             "disconnected": player.disconnected,
             "active_effects": player.active_effects,
+            "eliminated": player.eliminated,
         }
 
-    return {
+    from engine.evaluator import get_best_hand_rank, get_hand_class
+
+    res = {
         "room_code": state.room_code,
         "phase": state.phase,
         "players": players_out,
@@ -116,37 +115,88 @@ def serialize_state(state: GameState, perspective_player_id: str) -> dict:
         "pot": state.pot,
         "current_bet": state.current_bet,
         "active_player_id": state.active_player_id,
-        "awaiting_response": state.awaiting_response,
         "player_order": state.player_order,
         "hand_number": state.hand_number,
-        "power_history": state.power_history,
         "winners": state.winners,
         "hand_summaries": state.hand_summaries,
     }
 
+    # Add current hand evaluation for the perspective player
+    perspective_player = state.players.get(perspective_player_id)
+    if perspective_player and not perspective_player.folded and len(state.community_cards) >= 3:
+        try:
+            rank = get_best_hand_rank(perspective_player.hole_cards, state.community_cards)
+            res["current_hand"] = get_hand_class(rank)
+        except:
+            pass
+
+    return res
+
+def check_for_hand_winner(state: GameState) -> bool:
+    # Check if only one player remains (not folded, not eliminated, not disconnected)
+    active_players = [
+        p for p in state.players.values()
+        if not p.folded and not p.disconnected and not p.eliminated
+    ]
+    
+    if len(active_players) == 1:
+        winner = active_players[0]
+        winner.chips += state.pot
+        chips_won = state.pot
+        state.winners = [winner.id]
+        state.phase = Phase.HAND_COMPLETE
+        
+        # Eliminate players and check for game over
+        state = eliminate_broke_players(state)
+        remaining_players = [p for p in state.players.values() if not p.eliminated]
+        if len(remaining_players) <= 1:
+            state.phase = Phase.GAME_OVER
+        else:
+            # Schedule next hand
+            from api.socket import sio
+            async def schedule_new_hand_fold(room_code: str):
+                # Emit hand_result immediately so leaderboard updates
+                await sio.emit("hand_result", {
+                    "winner_id": winner.id,
+                    "username": winner.username,
+                    "chips_won": chips_won,
+                }, room=room_code)
+                await asyncio.sleep(5)
+                if room_code in rooms:
+                    s_state = rooms[room_code]
+                    if s_state.phase != Phase.GAME_OVER and len(s_state.players) >= 2:
+                        s_state = start_new_hand(s_state)
+                        rooms[room_code] = s_state
+                        for pid in list(s_state.players.keys()):
+                            await sio.emit("game_state", serialize_state(s_state, pid), room=f"{room_code}:{pid}")
+            asyncio.create_task(schedule_new_hand_fold(state.room_code))
+        return True
+    return False
+
 def get_next_active_player(state: GameState, current_id: str) -> str | None:
     order = state.player_order
-    start = order.index(current_id)
+    try:
+        start = order.index(current_id)
+    except ValueError:
+        # Fallback if current_id somehow not in order
+        start = state.dealer_index
+        
     for i in range(1, len(order)):
         next_id = order[(start + i) % len(order)]
         player = state.players[next_id]
-        if not player.folded and not player.disconnected:
+        if not player.folded and not player.disconnected and not player.eliminated:
             return next_id
     return None
 
 def is_betting_round_over(state: GameState) -> bool:
     active_players = [
         p for p in state.players.values()
-        if not p.folded and not p.disconnected
+        if not p.folded and not p.disconnected and not p.eliminated
     ]
     # Round is over when all active players have matched the current bet and acted
     return all(p.has_acted and p.bet == state.current_bet for p in active_players)
 
 def advance_phase(state: GameState) -> GameState:
-    # Replenish momentum for all players on phase transition
-    for player in state.players.values():
-        replenish_momentum_for_phase(player, state.phase)
-
     # Reset bets and actions for new round
     for player in state.players.values():
         player.bet = 0
@@ -169,7 +219,14 @@ def advance_phase(state: GameState) -> GameState:
     # First to act post-flop is first active player after dealer
     if state.phase not in [Phase.SHOWDOWN, Phase.HAND_COMPLETE]:
         dealer_id = state.player_order[state.dealer_index]
-        state.active_player_id = get_next_active_player(state, dealer_id)
+        next_id = get_next_active_player(state, dealer_id)
+        if next_id:
+            state.active_player_id = next_id
+            state.turn_index += 1
+            # Start timer for the first player of the next round
+            asyncio.create_task(
+                auto_fold_timer(state.room_code, next_id, state.hand_number, state.turn_index, AUTO_FOLD_SECONDS)
+            )
 
     return state
 
@@ -185,6 +242,15 @@ def resolve_showdown(state: GameState) -> GameState:
 
     state.phase = Phase.HAND_COMPLETE
     
+    # Eliminate players who are out of chips
+    state = eliminate_broke_players(state)
+    
+    # Check if game is over (only 1 player with chips remaining)
+    remaining_players = [p for p in state.players.values() if not p.eliminated]
+    if len(remaining_players) <= 1:
+        state.phase = Phase.GAME_OVER
+        return state
+
     # Schedule an auto-restart
     from api.socket import sio
     import asyncio
@@ -193,22 +259,37 @@ def resolve_showdown(state: GameState) -> GameState:
         await asyncio.sleep(5)  # 5 seconds to view showdown
         if room_code in rooms:
             s_state = rooms[room_code]
+            # Don't restart if game is over or not enough players
+            if s_state.phase == Phase.GAME_OVER:
+                return
             if len(s_state.players) >= 2:
                 s_state = start_new_hand(s_state)
                 rooms[room_code] = s_state
-                for pid in s_state.player_order:
+                for pid in list(s_state.players.keys()):
                     await sio.emit("game_state", serialize_state(s_state, pid), room=f"{room_code}:{pid}")
 
     asyncio.create_task(schedule_new_hand(state.room_code))
+
+    # Emit hand_result so clients can update leaderboard
+    share = state.pot // len(winners)
+    for winner_id in winners:
+        winner_player = state.players[winner_id]
+        async def _emit_result(wid=winner_id, wname=winner_player.username, wchips=share):
+            await sio.emit("hand_result", {
+                "winner_id": wid,
+                "username": wname,
+                "chips_won": wchips,
+            }, room=state.room_code)
+        asyncio.create_task(_emit_result())
     
     return state
 
 def eliminate_broke_players(state: GameState) -> GameState:
-    # Remove players with 0 chips from the game
-    broke_ids = [pid for pid, p in state.players.items() if p.chips <= 0]
+    # Mark players with 0 chips as eliminated
+    broke_ids = [pid for pid, p in state.players.items() if p.chips <= 0 and not p.eliminated]
     for pid in broke_ids:
-        state.players.pop(pid)
-        state.player_order.remove(pid)
+        state.players[pid].eliminated = True
+        # Keep them in player_order so they stay on the table as eliminated
     return state
 
 async def start_game_in_room(room_code: str, player_id: str) -> dict:
@@ -229,7 +310,8 @@ async def start_game_in_room(room_code: str, player_id: str) -> dict:
     rooms[room_code] = state
     
     # Broadcast updated state to each player from their perspective
-    for pid in state.player_order:
+    # Including everyone who was in the room so they see the final result
+    for pid in list(state.players.keys()):
         player_state = serialize_state(state, pid)
         await sio.emit("game_state", player_state, room=f"{room_code}:{pid}")
 
@@ -248,35 +330,6 @@ async def handle_action(room_code: str, data: dict) -> dict:
 
     if state.active_player_id != player_id:
         return {"error": "Not your turn"}
-
-    # Handle power card activation alongside action
-    power_id = data.get("power_id")
-    power_targets = data.get("power_targets", {})
-
-    if power_id:
-        state, error, private_data = apply_power(state, player_id, power_id, power_targets)
-        if error:
-            return {"error": error}
-            
-        # Send private peek data if any
-        if private_data and "peek" in private_data:
-            await sio.emit("power_peek", private_data["peek"], room=f"{room_code}:{player_id}")
-
-        # Open response window for opponents
-        state.awaiting_response = True
-        state.response_deadline = time.time() + RESPONSE_WINDOW_SECONDS
-
-        # Broadcast power activation to room
-        await sio.emit("power_activated", {
-            "player_id": player_id,
-            "power_id": power_id,
-            "deadline": state.response_deadline,
-        }, room=room_code)
-
-        # Wait for response window
-        await asyncio.sleep(RESPONSE_WINDOW_SECONDS)
-        state.awaiting_response = False
-        state.response_deadline = None
 
     # Handle betting action
     amount = data.get("amount", 0)
@@ -309,17 +362,9 @@ async def handle_action(room_code: str, data: dict) -> dict:
 
     if did_bet_action:
         player.has_acted = True
-
     # Check if only one player remains
-    active_players = [
-        p for p in state.players.values()
-        if not p.folded and not p.disconnected
-    ]
-    if len(active_players) == 1:
-        winner = active_players[0]
-        winner.chips += state.pot
-        state.phase = Phase.HAND_COMPLETE
-
+    if check_for_hand_winner(state):
+        pass # Winners handled in check_for_hand_winner
     # Advance to next player or next phase
     elif is_betting_round_over(state):
         state = advance_phase(state)
@@ -327,49 +372,23 @@ async def handle_action(room_code: str, data: dict) -> dict:
         next_id = get_next_active_player(state, player_id)
         if next_id:
             state.active_player_id = next_id
+            state.turn_index += 1
             # Start auto-fold timer for next player
             asyncio.create_task(
-                auto_fold_timer(room_code, next_id, AUTO_FOLD_SECONDS)
+                auto_fold_timer(room_code, next_id, state.hand_number, state.turn_index, AUTO_FOLD_SECONDS)
             )
 
     rooms[room_code] = state
 
     # Broadcast updated state to each player from their perspective
-    for pid in state.player_order:
+    # Including everyone who was in the room so they see the final result
+    for pid in list(state.players.keys()):
         player_state = serialize_state(state, pid)
         await sio.emit("game_state", player_state, room=f"{room_code}:{pid}")
 
     return {"success": True}
 
-async def handle_power_response(room_code: str, data: dict) -> None:
-    from api.socket import sio
-
-    state = get_state(room_code)
-    player_id = data.get("player_id")
-    power_id = data.get("power_id")
-    power_targets = data.get("power_targets", {})
-
-    if not state.awaiting_response:
-        return
-
-    if power_id:
-        state, error, private_data = apply_power(state, player_id, power_id, power_targets)
-        if error:
-            await sio.emit("error", {"message": error}, room=f"{room_code}:{player_id}")
-            return
-            
-        # Send private peek data if any
-        if private_data and "peek" in private_data:
-            await sio.emit("power_peek", private_data["peek"], room=f"{room_code}:{player_id}")
-
-    state.awaiting_response = False
-    state.response_deadline = None
-    rooms[room_code] = state
-
-    for pid in state.player_order:
-        await sio.emit("game_state", serialize_state(state, pid), room=f"{room_code}:{pid}")
-
-async def auto_fold_timer(room_code: str, player_id: str, seconds: int) -> None:
+async def auto_fold_timer(room_code: str, player_id: str, hand_number: int, turn_index: int, seconds: int) -> None:
     from api.socket import sio
 
     await asyncio.sleep(seconds)
@@ -378,6 +397,10 @@ async def auto_fold_timer(room_code: str, player_id: str, seconds: int) -> None:
         return
 
     state = rooms[room_code]
+
+    # STALE TIMER PROTECTION: Verify this timer is for the CURRENT turn
+    if state.hand_number != hand_number or state.turn_index != turn_index:
+        return
 
     if state.active_player_id != player_id:
         return  # Player already acted
@@ -389,21 +412,18 @@ async def auto_fold_timer(room_code: str, player_id: str, seconds: int) -> None:
     player.folded = True
     player.disconnected = True
 
-    active_players = [
-        p for p in state.players.values()
-        if not p.folded and not p.disconnected
-    ]
-
-    if len(active_players) == 1:
-        winner = active_players[0]
-        winner.chips += state.pot
-        state.phase = Phase.HAND_COMPLETE
-    else:
+    # Check for winners and advance turn
+    if not check_for_hand_winner(state):
         next_id = get_next_active_player(state, player_id)
         if next_id:
             state.active_player_id = next_id
+            state.turn_index += 1
+            # Start next timer
+            asyncio.create_task(
+                auto_fold_timer(room_code, next_id, state.hand_number, state.turn_index, AUTO_FOLD_SECONDS)
+            )
 
     rooms[room_code] = state
 
-    for pid in state.player_order:
+    for pid in list(state.players.keys()):
         await sio.emit("game_state", serialize_state(state, pid), room=f"{room_code}:{pid}")

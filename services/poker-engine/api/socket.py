@@ -56,3 +56,24 @@ async def player_action(sid, data):
     room_code = data["room_code"]
     # Internal broadcasting in handle_action handles game_state updates
     await handle_action(room_code, data)
+@sio.event
+async def restart_game(sid, data):
+    from engine.room import rooms, start_new_hand, serialize_state
+    room_code = data["room_code"]
+    player_id = data["player_id"]
+    
+    if room_code in rooms:
+        state = rooms[room_code]
+        for p in state.players.values():
+            p.chips = 1000
+            p.eliminated = False
+            p.folded = False
+            p.disconnected = False
+            p.has_acted = False
+            p.active_effects = []
+            p.hole_cards = []
+            
+        state = start_new_hand(state)
+        rooms[room_code] = state
+        for pid in list(state.players.keys()):
+            await sio.emit("game_state", serialize_state(state, pid), room=f"{room_code}:{pid}")

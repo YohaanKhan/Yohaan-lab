@@ -1,0 +1,110 @@
+2026-03-16 10:00:14,352 [PID 9624] INFO No binary specified, looking for `pyre.bin` in PATH
+2026-03-16 10:00:14,352 [PID 9624] INFO Pyre binary is located at `/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/bin/pyre.bin`
+2026-03-16 10:00:14,353 [PID 9624] INFO Could not determine the number of Pyre workers from configuration. Auto-set the value to 4.
+2026-03-16 10:00:14,357 [PID 9624] INFO No typeshed specified, looking for it...
+2026-03-16 10:00:14,357 [PID 9624] INFO Found: `/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed`
+2026-03-16 10:00:14,358 [PID 9624] INFO Writing arguments into /var/folders/2j/hw0vgcc928l3p_0fmxwf87ww0000gn/T/pyre_arguments_077p5o32.json...
+2026-03-16 10:00:14,358 [PID 9624] DEBUG Arguments:
+{
+  "source_paths": {
+    "kind": "simple",
+    "paths": [
+      "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine"
+    ]
+  },
+  "search_paths": [
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$orjson",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$idna",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$click",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$httpcore",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$fastapi",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$jinja2",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$email_validator",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$websockets",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$tomli",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$markdown_it",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$tomli_w",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$h11",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$rich_toolkit",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$certifi",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$fastapi_cli",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$testslide",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$jwt",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$marshmallow",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$postgrest",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$h2",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$starlette",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$typer",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$bidict",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$rich",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$annotated_types",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$typing_inspection",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$markupsafe",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$dataclasses_json",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$ujson-stubs",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$sniffio",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$hpack",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$watchfiles",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$httpx",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$dotenv",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$hyperframe",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$gotrue",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$mdurl",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$uvicorn",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$strenum",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$dns",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$packaging",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$python_multipart",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$uvloop",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$annotated_doc",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$pydantic_core",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$pydantic",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$pip",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$wsproto",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$typeguard",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$libcst",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$anyio",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/python3.14/site-packages$supabase",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stdlib",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/ExifRead",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/PyMySQL",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/PyYAML",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/aiofiles",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/chevron",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/colorama",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/ldap3",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/mysqlclient",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/paramiko",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/psycopg2",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/pycurl",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/python-dateutil",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/pytz",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/regex",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/requests",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/retry",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/tqdm",
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/lib/pyre_check/typeshed/stubs/ujson"
+  ],
+  "excludes": [],
+  "checked_directory_allowlist": [
+    "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine"
+  ],
+  "checked_directory_blocklist": [],
+  "extensions": [],
+  "log_path": "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.pyre",
+  "global_root": "/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine",
+  "debug": false,
+  "python_version": {
+    "major": 3,
+    "minor": 14,
+    "micro": 3
+  },
+  "system_platform": "darwin",
+  "shared_memory": {},
+  "parallel": true,
+  "number_of_workers": 4,
+  "additional_logging_sections": [],
+  "show_error_traces": false,
+  "strict": false
+}
+2026-03-16 10:00:14,360 [PID 9624] ERROR [Errno 86] Bad CPU type in executable: '/Users/yohaankhan/Desktop/yohaan-lab/services/poker-engine/.venv/bin/pyre.bin'

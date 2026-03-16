@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&family=Roboto:wght@400;700&display=swap');
 @import "tailwindcss";
 
 /* Scan the shared UI package so token-based classes (bg-surface, border-border, etc.) are generated */
@@ -18,7 +19,8 @@
   --color-muted: #666666;
   --color-accent: #4f8ef7;
 
-  --font-sans: var(--font-geist-sans);
+  --font-sans: 'Roboto', var(--font-geist-sans);
+  --font-display: 'Outfit', sans-serif;
   --font-mono: var(--font-geist-mono);
 
   --radius-sm: 6px;
