@@ -33,12 +33,12 @@ export const projects: ProjectData[] = [
   },
   {
     id: "poker",
-    title: "Poker Royale",
-    description: "Texas Hold'em with power-up cards and private rooms.",
+    title: "Nah I'd Gamble",
+    description: "Texas Hold'em with real-time multiplayer and private rooms.",
     icon: Spade,
     href: "/poker",
     tags: ["Next.js", "Socket.io", "Python", "FastAPI"],
-    status: "in-progress",
+    status: "live",
 },
   {
     id: "diary",
