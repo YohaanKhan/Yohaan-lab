@@ -70,10 +70,10 @@ export const projects: ProjectData[] = [
   {
     id: "blog",
     title: "Blog",
-    description: "How I built everything on this site.",
+    description: "Code explanations, travelogues, book reviews, and more.",
     icon: FileText,
     href: "/blog",
-    tags: ["Writing"],
-    status: "coming-soon",
+    tags: ["Code", "Travel", "Books", "Writing"],
+    status: "live",
   },
 ];

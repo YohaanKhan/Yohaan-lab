@@ -6,6 +6,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Yohaan Khan",
   description: "AI Systems & Experiments",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
