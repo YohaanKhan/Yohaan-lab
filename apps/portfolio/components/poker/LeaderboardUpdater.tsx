@@ -24,9 +24,10 @@ async function upsertLeaderboard(winner_id: string, username: string, chips_won:
       p_username: username,
       p_chips_won: chips_won,
     });
-    if (error) console.warn("[Leaderboard]", error.message);
-  } catch {
-    // Non-critical
+    if (error) console.error("[Leaderboard] Update failed:", error.message);
+    else console.log("[Leaderboard] Successfully updated for:", username);
+  } catch (err) {
+    console.error("[Leaderboard] RPC Error:", err);
   }
 }
 
