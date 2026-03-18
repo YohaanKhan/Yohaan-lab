@@ -1,5 +1,5 @@
 import type { ProjectCardProps } from "@yohaan-lab/ui";
-import { Bot, Pencil, Crown, Spade, BookOpen, GitBranch, Search, FileText } from "lucide-react";
+import { Bot, Pencil, Crown, Spade, BookOpen, GitBranch, Search, FileText, ShieldCheck } from "lucide-react";
 
 type ProjectData = ProjectCardProps & { id: string };
 
@@ -74,6 +74,15 @@ export const projects: ProjectData[] = [
     icon: FileText,
     href: "/blog",
     tags: ["Code", "Travel", "Books", "Writing"],
+    status: "live",
+  },
+  {
+    id: "trycheat",
+    title: "TryCheat",
+    description: "An AI-powered VS Code extension for exam monitoring. Provides intelligent workspace tracking and activity monitoring to ensure academic integrity during remote assessments.",
+    icon: ShieldCheck,
+    href: "https://open-vsx.org/extension/yohaankhan/trycheat",
+    tags: ["VS Code", "Extension", "AI", "Monitoring"],
     status: "live",
   },
 ];
